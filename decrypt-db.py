@@ -139,11 +139,11 @@ def do_decrypt(input, output, key):
     c = conn.cursor()
     version_str = list(conn.execute("PRAGMA cipher_version"))[0][0]
     version = tuple([int(x) for x in version_str.split(".")])
-    assert version >= (4, 1), "Sqlcipher>=4.1 is required"
+    assert version >= (3, 1), "Sqlcipher>=3.1 is required"
 
     c.execute("PRAGMA key = '" + key + "';")
-    # https://github.com/sqlcipher/sqlcipher/commit/e4b66d6cc8a2b7547a32ff2c3ac52f148eba3516
-    c.execute("PRAGMA cipher_compatibility = 1;")
+    c.execute("PRAGMA cipher_use_hmac = OFF;")
+    c.execute("PRAGMA kdf_iter = '4000';")
     try:
         c.execute("ATTACH DATABASE '" + output + "' AS db KEY '';")
     except Exception as e:
